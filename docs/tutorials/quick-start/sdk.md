@@ -21,6 +21,12 @@ Install the SDK in your project with:
 npm -i @certusone/wormhole-sdk
 ```
 
+Or
+
+```sh
+yarn add @certusone/wormhole-sdk
+```
+
 ## Attesting a token
 
 In order for a token to be transferred between chains, first the wrapped version must exist on the Target Chain. This is referred to as `Attesting` the token.
@@ -121,7 +127,6 @@ To see if a token already exists on the Target Chain:
 {% tab title="Solana" %}
 
 ```ts
-// If the 
 const oa = await getOriginalAssetSol(
     connection,
     tokenBridgeAddress,

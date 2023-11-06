@@ -1,5 +1,6 @@
 import * as cfg from "./config";
 
+import { CONFIG as connectConfig } from '@wormhole-foundation/wormhole-connect-sdk'
 import { ChainConfig as SdkChainConfig, Contracts as SdkContracts, ChainName, Network, chains, CONFIG as newconf, toChainId } from '@wormhole-foundation/connect-sdk'
 import { CHAINS as whchains, relayer, CONTRACTS as whcontracts } from '@certusone/wormhole-sdk'
 
@@ -68,8 +69,8 @@ function checkWhSdk() {
     }
 }
 
+function checkDoc() {
 
-(async function () {
     const chains = cfg.getDocChains();
     for (const chain of chains) {
         const sdkName = idToChainName.get(chain.id)!
@@ -118,6 +119,36 @@ function checkWhSdk() {
 
 
     }
+}
+
+
+(async function () {
+    for (const [network, conf] of Object.entries(connectConfig)) {
+        const net = mapnet(network);
+        for (const [chain, cc] of Object.entries(conf.chains)) {
+            const id = cc.id
+            const newContracts = newconf[net].chains[idToChainName.get(id)!]?.contracts
+            if (newContracts === undefined) {
+                console.log(`Chain ${id} not found in new config`)
+                continue
+            }
+
+            if (cc.contracts.token_bridge !== newContracts.tokenBridge)
+                console.log(`Token bridge mismatch for ${id} ${net} ${chain}: ${cc.contracts.token_bridge} vs ${newContracts.tokenBridge}`)
+
+            if (cc.contracts.nft_bridge !== newContracts.nftBridge)
+                console.log(`NFT bridge mismatch for ${id} ${net} ${chain}: ${cc.contracts.nft_bridge} vs ${newContracts.nftBridge}`)
+
+            if (cc.contracts.relayer !== newContracts.tokenBridgeRelayer)
+                console.log(`Relayer mismatch for ${id} ${net} ${chain}: ${cc.contracts.relayer} vs ${newContracts.tokenBridgeRelayer}`)
+
+            if (cc.contracts.core !== newContracts.coreBridge)
+                console.log(`Core bridge mismatch for ${id} ${net} ${chain}: ${cc.contracts.core} vs ${newContracts.coreBridge}`)
+
+            if (cc.contracts.cctpContracts?.wormholeCCTP?.toLowerCase() !== newContracts.cctp?.wormhole.toLowerCase())
+                console.log(`CCTP mismatch for ${id} ${net} ${chain}: ${cc.contracts.cctpContracts?.wormholeCCTP} vs ${newContracts.cctp?.wormhole}`)
+
+        }
+    }
 
 })()
-
